@@ -117,7 +117,7 @@ def _read_null_terminated_string(f:BufferedReader, encoding='utf-8'):
     
     s = b''
     while True:
-        if f.eof():
+        if f.peek(1) == b'':
             raise EOFError
         c = f.read(1)
         if c == b'\0':
@@ -212,10 +212,10 @@ def _load_embeddings_from_file(path:str):
         tensor_buffer_size = int.from_bytes(f.read(8), 'little')
         tensor_buffer = f.read(tensor_buffer_size)
 
-        index = np.load(io.BytesIO(index_buffer))
-        tensor = np.load(io.BytesIO(tensor_buffer))
+        index = np.load(io.BytesIO(index_buffer), allow_pickle=True)
+        tensor = np.load(io.BytesIO(tensor_buffer), allow_pickle=True)
         
-        return pd.DataFrame(tensor, index=index, columns=[column_name])
+        return pd.DataFrame(tensor, index=index, columns=[column_name]), column_name
 
 
 class tensorwich:
@@ -259,19 +259,25 @@ class tensorwich:
         # TODO : Implement generate_embeddings function
         pass
 
-    def load(self, path:str, *, embedding_column_name:str='embedding'):
+    @classmethod
+    def load(cls, path:str, *, embedding_column_name:str='embedding', read_csv_args:Dict[str, Any]=None, **kwargs):
+        if read_csv_args is None:
+            read_csv_args = {}
+        
         # Get the base path
         base_path = path
         if base_path.endswith('.csv'):
             base_path = base_path[:-4]
         
-        glob_path = base_path+"*"
+        glob_path = base_path+"*.emb"
         files = glob(glob_path)
         if len(files) == 0:
             raise FileNotFoundError(f"No files found at path {glob_path}")
         
         # Load the CSV
-        self.df = pd.read_csv(base_path+".csv")
+        df = pd.read_csv(base_path+".csv", **read_csv_args)
+
+        output = cls(df)
 
         embeddings = []
         # Load the embeddings
@@ -279,8 +285,12 @@ class tensorwich:
             if file.endswith('.csv'):
                 continue
 
-            embedding = _load_embeddings_from_file(file)
-            embeddings.append(embedding)
+            embedding, column_name = _load_embeddings_from_file(file)
+            output.add_embedding(column_name, embedding)
+        
+        return output
+        
+
             
         
 

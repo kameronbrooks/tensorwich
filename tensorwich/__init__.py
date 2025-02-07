@@ -1,3 +1,3 @@
-from .core import TensorWich
+from .core import tensorwich
 
-__all__ = ['TensorWich']
+__all__ = ['tensorwich']

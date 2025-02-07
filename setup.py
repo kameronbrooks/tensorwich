@@ -8,7 +8,7 @@ setup(
     description='A library for saving embeddings for pandas dataframes',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/yourusername/tensorwich',
+    url='https://github.com/kameronbrooks/tensorwich',
     packages=find_packages(),
     install_requires=[
         "numpy",

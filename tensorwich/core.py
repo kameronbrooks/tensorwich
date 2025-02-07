@@ -242,12 +242,17 @@ class tensorwich:
             _save_embeddings_to_file(base_path+f".{column_name}.emb", self.df[[column_name]], embedding_column_name=column_name)
 
     
-    def add_embedding(self, column_name:str, embedding:np.ndarray):
+    def add_embedding(self, column_name:str, embedding:np.ndarray|List[np.ndarray]):
 
         if self.df is None:
             raise ValueError("This object does not have a dataframe yet")
         if column_name in self.df.columns:
             raise ValueError(f"Column '{column_name}' already exists in dataframe")
+        
+
+        if hasattr(embedding, 'shape') and len(embedding.shape) > 1:
+            embedding = [x for x in embedding]
+        
         if len(embedding) != self.df.shape[0]:
             raise ValueError(f"Embedding length ({len(embedding)}) does not match dataframe length ({self.df.shape[0]})")
         

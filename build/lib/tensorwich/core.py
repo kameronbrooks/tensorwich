@@ -223,21 +223,7 @@ class tensorwich:
         self.df:pd.DataFrame = df
         self.embedding_columns = []
     
-    def save(self, path:str, csv_args:Dict[str, Any]=None, **kwargs) -> None:
-        """
-        Save the dataframe to a file
-
-        Parameters
-        ----------
-        path : str
-            The path to save the dataframe to
-        csv_args : Dict[str, Any]
-            The arguments to pass to the pandas to_csv function
-
-        Returns
-        -------
-        None
-        """
+    def save(self, path:str, csv_args:Dict[str, Any]=None, **kwargs):
         if csv_args is None:
             csv_args = {}
         
